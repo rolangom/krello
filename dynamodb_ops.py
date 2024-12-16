@@ -8,7 +8,9 @@ def get_client(env: str | None = None):
         return boto3.client(
             "dynamodb",
             endpoint_url="http://localhost:8000",  # Local DynamoDB endpoint
-            region_name="local",
+            region_name="us-east-1",
+            aws_access_key_id="local",
+            aws_secret_access_key="local",
         )
     else:
         return boto3.client(
