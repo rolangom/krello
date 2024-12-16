@@ -1,0 +1,6 @@
+boto3==1.35.80
+graphene==2.1.9 
+starlette-graphene3==0.6.0
+graphql-core==3.2.5
+fastapi==0.115.6
+uvicorn==0.25.0
