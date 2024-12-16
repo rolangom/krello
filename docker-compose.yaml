@@ -1,0 +1,19 @@
+version: '3'
+
+volumes: 
+  dynamodb_data:
+
+services:
+  dynamodb:
+    image: amazon/dynamodb-local
+    command: -jar DynamoDBLocal.jar -sharedDb -dbPath /home/dynamodblocal/data/
+    volumes:
+     - dynamodb_data:/home/dynamodblocal/data
+    ports:
+     - "8000:8000"
+
+  krello:
+    build: .
+    ports:
+     - "8080:8080"
+

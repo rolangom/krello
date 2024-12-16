@@ -1,13 +1,14 @@
-# Start Generation Here
-FROM node:14 AS build
+# Stage 1: Build React client
+FROM node:18 AS frontend
 
 # Set the working directory
-WORKDIR /app/client
+WORKDIR /app
 
 # Copy package.json and package-lock.json
-COPY client/package*.json ./
+COPY client/package*.json ./client/
 
-# Install dependencies
+# Set working directory to client and install dependencies
+WORKDIR /app/client
 RUN npm install
 
 # Copy the rest of the client code
@@ -16,27 +17,25 @@ COPY client/ ./
 # Build the client
 RUN npm run build
 
-# Optional: Verify build
-RUN ls -la /app/client/dist
-
 # Stage 2: Set up FastAPI
 FROM python:3.11
 
 # Set the working directory for FastAPI
 WORKDIR /app
 
-# Copy the FastAPI app code
-COPY . ./
-
-# Install FastAPI and other dependencies
+# Copy requirements first to leverage Docker cache
+COPY requirements.txt .
 RUN pip install -r requirements.txt
 
+# Copy the FastAPI app code
+COPY . .
+
 # Copy the built client from the previous stage
-COPY --from=build /app/client/dist ./client/dist
+COPY --from=frontend /app/client/dist ./client/dist
+
 
 # Expose the port for FastAPI
 EXPOSE 8080
 
-# Command to run the FastAPI app
-CMD ["uvicorn", "fastapi_app:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
-# End Generation Here
+# Set the entrypoint to run the FastAPI app
+ENTRYPOINT ["uvicorn", "fastapi_app:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
