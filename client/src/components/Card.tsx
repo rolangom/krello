@@ -1,4 +1,3 @@
-import { useTransition } from "react";
 import { useCards } from "../hooks/useCards";
 import { Card as CardType } from "../types";
 
@@ -8,12 +7,9 @@ interface CardProps {
 }
 
 const Card: React.FC<CardProps> = ({ card, openDialog }) => {
-  const { deleteCard } = useCards();
-  const [isDeleteTransition, startDeleteTransition] = useTransition();
+  const { deleteCard, deleteCardLoading } = useCards();
   function handleDeleteCard() {
-    startDeleteTransition(() => {
-      deleteCard(card.id)
-    });
+    deleteCard(card.id)
   }
 
   function handleEditCard() {
@@ -29,8 +25,12 @@ const Card: React.FC<CardProps> = ({ card, openDialog }) => {
         Created: {new Date(card.createdAt).toLocaleDateString()}
       </p>
       <div className="flex justify-end gap-2">
-        <button className="bg-red-500 text-white p-2 rounded hover:bg-red-600" onClick={handleDeleteCard} disabled={isDeleteTransition}>Delete</button>
-        <button className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600" onClick={handleEditCard}>Edit</button>
+        <button className="bg-red-500 text-white p-2 rounded hover:bg-red-600" onClick={handleDeleteCard} disabled={deleteCardLoading}>
+          {deleteCardLoading ? "Deleting..." : "Delete"}
+        </button>
+        <button className="bg-blue-500 text-white p-2 rounded hover:bg-blue-600" onClick={handleEditCard}>
+          Edit
+        </button>
       </div>
     </div>
   );

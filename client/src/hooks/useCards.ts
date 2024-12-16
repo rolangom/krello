@@ -64,35 +64,11 @@ const DELETE_CARD = gql`
   }
 `;
 
-// const initialCards: Card[] = [
-//   {
-//     id: "1",
-//     title: "Card 1",
-//     description: "Description 1",
-//     createdAt: new Date().toISOString(),
-//     status: "TODO",
-//   },
-//   {
-//     id: "2",
-//     title: "Card 2",
-//     description: "Description 2",
-//     createdAt: new Date().toISOString(),
-//     status: "IN_PROGRESS",
-//   },
-//   {
-//     id: "3",
-//     title: "Card 3",
-//     description: "Description 3",
-//     createdAt: new Date().toISOString(),
-//     status: "DONE",
-//   },
-// ];
-
 export const useCards = () => {
   const { data, loading, error } = useQuery<{ cards: Card[] }>(GET_CARDS);
-  const [createCardMutation] = useMutation(CREATE_CARD);
-  const [updateCardMutation] = useMutation(UPDATE_CARD);
-  const [deleteCardMutation] = useMutation(DELETE_CARD);
+  const [createCardMutation, { loading: createCardLoading }] = useMutation(CREATE_CARD);
+  const [updateCardMutation, { loading: updateCardLoading }] = useMutation(UPDATE_CARD);
+  const [deleteCardMutation, { loading: deleteCardLoading }] = useMutation(DELETE_CARD);
   const apolloClient = useApolloClient();
 
   const createCard = async (
@@ -134,12 +110,14 @@ export const useCards = () => {
 
   return {
     cards: data?.cards || [],
-    // cards,
     loading,
     error,
     createCard,
     updateCard,
     deleteCard,
     updateCardStatus,
+    createCardLoading,
+    updateCardLoading,
+    deleteCardLoading,
   };
 };

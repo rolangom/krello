@@ -1,25 +1,31 @@
-import React, { useState } from "react";
+import React from "react";
 import { CardStatus, Card, STATUSES } from "../types";
 import { useCards } from "../hooks/useCards";
 
-const CreateCardForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
-  const state = history.state as Card | undefined;
-  const [title, setTitle] = useState(state?.title || "");
-  const [description, setDescription] = useState(state?.description || "");
-  const [status, setStatus] = useState<CardStatus>(state?.status || STATUSES.TODO);
-  const { createCard, updateCard } = useCards();
+interface Props {
+  onClose: () => void;
+}
 
-  const handleSubmit = (e: React.FormEvent) => {
+const CreateCardForm: React.FC<Props> = ({ onClose }) => {
+  const state = history.state as Card | undefined;
+  const { createCard, updateCard, createCardLoading, updateCardLoading } = useCards();
+
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (state) {
-      updateCard(state.id, title, description, status);
-    } else {
-      createCard(title, description, status);
-    }
-    setTitle("");
-    setDescription("");
-    setStatus(STATUSES.TODO);
-    onClose();
+    const form = e.currentTarget;
+    const formData = new FormData(form);
+    
+    const title = formData.get('title') as string;
+    const description = formData.get('description') as string;
+    const status = formData.get('status') as CardStatus;
+
+    const operation = state
+      ? () => updateCard(state.id, title, description, status)
+      : () => createCard(title, description, status);
+
+    operation().then(() => {
+      onClose();
+    });
   };
 
   return (
@@ -29,7 +35,7 @@ const CreateCardForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
     >
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-xl font-semibold">Create New Card</h2>
-        <button onClick={onClose} className=" text-black p-2">
+        <button onClick={onClose} className="text-black p-2">
           &times;
         </button>
       </div>
@@ -43,8 +49,8 @@ const CreateCardForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <input
           type="text"
           id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          name="title"
+          defaultValue={state?.title}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           required
         />
@@ -58,8 +64,8 @@ const CreateCardForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         </label>
         <textarea
           id="description"
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          name="description"
+          defaultValue={state?.description}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           rows={3}
           required
@@ -74,8 +80,8 @@ const CreateCardForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         </label>
         <select
           id="status"
-          value={status}
-          onChange={(e) => setStatus(e.target.value as CardStatus)}
+          name="status"
+          defaultValue={state?.status || STATUSES.TODO}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
         >
           <option value={STATUSES.TODO}>To Do</option>
@@ -87,7 +93,7 @@ const CreateCardForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
         <button
           type="button"
           onClick={onClose}
-          className=" bg-red-500 text-white p-2 rounded"
+          className="bg-red-500 text-white p-2 rounded"
         >
           Cancel
         </button>
@@ -96,7 +102,7 @@ const CreateCardForm: React.FC<{ onClose: () => void }> = ({ onClose }) => {
           type="submit"
           className="w-full bg-blue-500 text-white p-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
         >
-          Save
+          {createCardLoading || updateCardLoading ? "Saving..." : "Save"}
         </button>
       </div>
     </form>
