@@ -26,7 +26,6 @@ def create_table(table_name: str, dynamodb):
     Parameters:
         table_name (str): The name of the table to create
     """
-    dynamodb = get_client()
 
     try:
         response = dynamodb.create_table(

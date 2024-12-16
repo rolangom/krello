@@ -1,3 +1,5 @@
+import os
+
 from fastapi import FastAPI
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
 from starlette_graphene3 import GraphQLApp, make_graphiql_handler
@@ -24,8 +26,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+env = os.getenv("ENV")
 
-repo = DynamoDBCardRepository(get_client())
+repo = DynamoDBCardRepository(get_client(env))
 
 
 # Add the GraphQL endpoint
