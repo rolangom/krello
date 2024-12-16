@@ -4,10 +4,10 @@ import { useCards } from "../hooks/useCards";
 
 interface Props {
   onClose: () => void;
+  state: Partial<Card>;
 }
 
-const CreateCardForm: React.FC<Props> = ({ onClose }) => {
-  const state = history.state as Card | undefined;
+const CreateCardForm: React.FC<Props> = ({ onClose, state }) => {
   const { createCard, updateCard, createCardLoading, updateCardLoading } = useCards();
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
@@ -19,8 +19,8 @@ const CreateCardForm: React.FC<Props> = ({ onClose }) => {
     const description = formData.get('description') as string;
     const status = formData.get('status') as CardStatus;
 
-    const operation = state
-      ? () => updateCard(state.id, title, description, status)
+    const operation = state.id
+      ? () => updateCard(state.id!, title, description, status)
       : () => createCard(title, description, status);
 
     operation().then(() => {

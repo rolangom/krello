@@ -8,7 +8,7 @@ import { useEffect } from "react";
 interface ColumnProps {
   status: CardStatus;
   cards: CardType[];
-  openDialog: () => void;
+  openDialog: (state: Partial<CardType>) => void;
 }
 
 const Column: React.FC<ColumnProps> = ({ status, cards, openDialog }) => {
@@ -31,7 +31,7 @@ const Column: React.FC<ColumnProps> = ({ status, cards, openDialog }) => {
     // @ts-ignore
     <div ref={parentRef} className="flex flex-col space-y-4 min-h-[500px]">
       {items.map((card) => (
-        <Card key={card.id + card.updatedAt} card={card} openDialog={openDialog} />
+        <Card key={card.id} card={card} openDialog={openDialog} />
       ))}
     </div>
   );

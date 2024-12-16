@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from "react";
 import {
+  Card,
   CardStatus,
   STATUSES,
   statusesLabels,
@@ -11,7 +12,7 @@ import Skeleton from "./skeleton";
 
 interface BoardProps {
   status: CardStatus;
-  openDialog: () => void;
+  openDialog: (state: Partial<Card>) => void;
 }
 
 const Board: React.FC<BoardProps> = ({ status, openDialog }) => {
@@ -20,7 +21,6 @@ const Board: React.FC<BoardProps> = ({ status, openDialog }) => {
     () => cards.filter((card) => card.status === status),
     [cards, status]
   );
-  console.log("Board cards", status, cardsFiltered);
   return (
     <div className="bg-gray-200 p-4 rounded-lg shadow-md w-80">
       <h2 className="text-lg font-semibold mb-4">{statusesLabels[status]}</h2>
@@ -36,30 +36,29 @@ const Board: React.FC<BoardProps> = ({ status, openDialog }) => {
 
 function Boards() {
   const { loading } = useCards();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [cardState, setCardState] = useState<Partial<Card>|undefined>(undefined);
 
-  const openDialog = () => {
-    setIsDialogOpen(true);
+  const handleNewItem = () => {
+    setCardState({});
   };
 
   const closeDialog = () => {
-    setIsDialogOpen(false);
-    history.replaceState(undefined, "");
+    setCardState(undefined);
   };
 
   if (loading) return <Skeleton />;
 
   return (
     <>
-      {isDialogOpen && (
+      {cardState && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
-          <CreateCardForm onClose={closeDialog} />
+          <CreateCardForm state={cardState} onClose={closeDialog} />
         </div>
       )}
       <div className="flex flex-col space-y-4">
         <div className="flex justify-end">
           <button
-            onClick={openDialog}
+            onClick={handleNewItem}
             className="bg-blue-500 text-white p-2 rounded"
           >
             Add Item
@@ -67,7 +66,7 @@ function Boards() {
         </div>
         <div className="flex flex-row space-x-4 overflow-x-auto pb-4">
           {Object.values(STATUSES).map((status) => (
-            <Board key={status} status={status} openDialog={openDialog} />
+            <Board key={status} status={status} openDialog={setCardState} />
           ))}
         </div>
       </div>

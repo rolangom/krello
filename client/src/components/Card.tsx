@@ -3,7 +3,7 @@ import { Card as CardType } from "../types";
 
 interface CardProps {
   card: CardType;
-  openDialog: () => void;
+  openDialog: (state: Partial<CardType>) => void;
 }
 
 const Card: React.FC<CardProps> = ({ card, openDialog }) => {
@@ -13,8 +13,7 @@ const Card: React.FC<CardProps> = ({ card, openDialog }) => {
   }
 
   function handleEditCard() {
-    history.replaceState(card, '');
-    openDialog();
+    openDialog(card);
   }
 
   return (
