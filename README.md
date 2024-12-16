@@ -13,6 +13,8 @@ pip install -r requirements.txt
 ## Build
 
 ```bash
+cd client
+npm install
 npm run build
 ```
 
